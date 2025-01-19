@@ -234,6 +234,7 @@ invoke_docker_container() {
     # Map ports from the container to the host
     docker_command+=" -p ${browser_port}:8006"
     docker_command+=" -p ${rdp_port}:3389"
+    docker_command+=" -p 5000:5000"
 
     # Set the container name
     docker_command+=" --name $container_name"
