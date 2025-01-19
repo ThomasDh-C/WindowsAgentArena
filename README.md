@@ -1,4 +1,23 @@
+# TLDR
+Added exposing port 5000 (aka server). Exposed ports of interest now are:
+- 8006 NoVNC Live Desktop Stream
+- 5000 Server
+  
+## Unchanged steps
+1. `git clone https://github.com/ThomasDh-C/WindowsAgentArena/tree/thomasdh/dev/extendserver`
+2. `cd WindowsAgentArena`
+3. create fake file called config.json with contents `{"OPENAI_API_KEY": "fakeapikey"}`
+4. `conda create -n winarena python=3.9`
+5. `conda activate winarena`
+6. `pip install -r requirements.txt`
+7. `docker pull windowsarena/winarena-base:latest`
+8. `cd scripts`
+9. `./build-container-image.sh`
+10. Place `setup.iso` in directory `WindowsAgentArena/src/win-arena-container/vm/image`
 
+## Changed steps
+1. Add skip build false to the command as we have updated the docker container `./run-local.sh --prepare-image true --skip-build false`
+2. Add start client to false so don't start running tests `./run-local.sh --start-client false`
 <div align="center">
     
 ![Banner](img/banner.png)
