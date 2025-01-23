@@ -6,7 +6,7 @@ from send2trash import send2trash
 from logging import FileHandler
 from logging.handlers import RotatingFileHandler
 from contextlib import redirect_stdout
-from io import StringIO
+from io import StringIO, BytesIO
 
 # Redirect stdout and stderr to log file
 class Logger(object):
@@ -309,11 +309,11 @@ def launch_app():
 def capture_screen_with_cursor():
     # DEPRECATED: if you want to capture the cursor, use the vm_controller.py screen capture function instead
 
-    file_path = os.path.join(os.path.dirname(__file__), "screenshots", "screenshot.png")
+    # file_path = os.path.join(os.path.dirname(__file__), "screenshots", "screenshot.png")
     user_platform = platform.system()
 
     # Ensure the screenshots directory exists
-    os.makedirs(os.path.dirname(file_path), exist_ok=True)
+    # os.makedirs(os.path.dirname(file_path), exist_ok=True)
 
     # fixme: This is a temporary fix for the cursor not being captured on Windows and Linux
     if user_platform == "Windows":
@@ -324,7 +324,6 @@ def capture_screen_with_cursor():
         # make the cursor smaller
         cursor = cursor.resize((int(cursor.width / 1.5), int(cursor.height / 1.5)))
         screenshot.paste(cursor, (cursor_x, cursor_y), cursor)
-        screenshot.save(file_path)
     elif user_platform == "Linux":
         cursor_obj = Xcursor()
         imgarray = cursor_obj.getCursorImageArrayFast()
@@ -332,14 +331,17 @@ def capture_screen_with_cursor():
         screenshot = pyautogui.screenshot()
         cursor_x, cursor_y = pyautogui.position()
         screenshot.paste(cursor_img, (cursor_x, cursor_y), cursor_img)
-        screenshot.save(file_path)
-    elif user_platform == "Darwin":  # (Mac OS)
-        # Use the screencapture utility to capture the screen with the cursor
-        subprocess.run(["screencapture", "-C", file_path])
+    # elif user_platform == "Darwin":  # (Mac OS)
+    #     # Use the screencapture utility to capture the screen with the cursor
+    #     subprocess.run(["screencapture", "-C", file_path])
     else:
         logger.warning(f"The platform you're using ({user_platform}) is not currently supported")
 
-    return send_file(file_path, mimetype='image/png')
+    # Convert PIL Image to bytes and send
+    img_io = BytesIO()
+    screenshot.save(img_io, 'PNG')
+    img_io.seek(0)
+    return send_file(img_io, mimetype='image/png')
 
 
 def _has_active_terminal(desktop: Accessible) -> bool:
@@ -1333,7 +1335,7 @@ def activate_window():
                 
         # window: Optional[gw.Window] = None
         # if len(windows) == 0:
-        #     return "Window {:} not found (empty results)".format(window_name), 404
+        #     return "Window {:} not found (strict mode).".format(window_name), 404
         # elif strict:
         #     for wnd in windows:
         #         if wnd.title == window_name:
